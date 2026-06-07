@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>管理员首页 - 图书管理系统</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,133.3C960,128,1056,96,1152,90.7C1248,85,1344,107,1392,117.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>')
+          no-repeat bottom;
+        background-size: cover;
+        opacity: 0.3;
+      }
+
+      .header {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        color: #333;
+        padding: 25px 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        position: relative;
+        z-index: 10;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 30px;
+      }
+
+      .header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .admin-badge {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(238, 90, 36, 0.3);
+      }
+
+      .welcome {
+        font-size: 16px;
+        color: #555;
+        font-weight: 500;
+      }
+
+      .btn {
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      .czh-btn:hover::before {
+        left: 100%;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-logout {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      }
+
+      .btn-logout:hover {
+        box-shadow: 0 8px 20px rgba(238, 90, 36, 0.3);
+      }
+
+      .main-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 30px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .welcome-section {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        animation: slideIn 0.6s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .welcome-content {
+        text-align: center;
+      }
+
+      .welcome-content h2 {
+        font-size: 36px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 15px;
+      }
+
+      .welcome-content p {
+        font-size: 18px;
+        color: #6b7280;
+        line-height: 1.6;
+      }
+
+      .admin-avatar {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 32px;
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 10px 25px rgba(238, 90, 36, 0.3);
+      }
+
+      .admin-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+      }
+
+      .action-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.8s ease-out;
+        animation-fill-mode: both;
+      }
+
+      .czh-action-card:nth-child(1) {
+        animation-delay: 0.1s;
+      }
+      .czh-action-card:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .czh-action-card:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+      .czh-action-card:nth-child(4) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .action-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 36px;
+        color: white;
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      .action-card h3 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 12px;
+      }
+
+      .action-card p {
+        font-size: 14px;
+        color: #6b7280;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+
+      .action-btn {
+        padding: 12px 30px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      .stats-section {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        margin-top: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
+
+      .stat-item {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        border-radius: 15px;
+        border-left: 4px solid #667eea;
+      }
+
+      .stat-number {
+        font-size: 32px;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 8px;
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: #6b7280;
+        font-weight: 500;
+      }
+
+      .books-section {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        margin-top: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .books-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f3f4f6;
+      }
+
+      .books-header h3 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #374151;
+      }
+
+      .books-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      .books-table th {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .books-table th:first-child {
+        border-radius: 12px 0 0 0;
+      }
+
+      .books-table th:last-child {
+        border-radius: 0 12px 0 0;
+      }
+
+      .books-table td {
+        padding: 15px;
+        border-bottom: 1px solid #e5e7eb;
+        color: #374151;
+        font-size: 14px;
+      }
+
+      .books-table tr:hover {
+        background: #f8fafc;
+      }
+
+      .books-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .book-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn-small {
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-small:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-danger {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      }
+
+      .btn-danger:hover {
+        box-shadow: 0 4px 12px rgba(238, 90, 36, 0.3);
+      }
+
+      @media (max-width: 768px) {
+        .header-content {
+          flex-direction: column;
+          gap: 20px;
+          padding: 0 20px;
+        }
+
+        .user-info {
+          flex-direction: column;
+          gap: 15px;
+          width: 100%;
+        }
+
+        .main-content {
+          padding: 20px 15px;
+        }
+
+        .welcome-section {
+          padding: 25px;
+        }
+
+        .welcome-content h2 {
+          font-size: 28px;
+        }
+
+        .admin-actions {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .books-table {
+          font-size: 12px;
+        }
+
+        .books-table th,
+        .books-table td {
+          padding: 10px 8px;
+        }
+
+        .book-actions {
+          flex-direction: column;
+          gap: 5px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <h1>📚 图书管理系统</h1>
+        <div class="user-info">
+          <div class="admin-badge">管理员</div>
+          <div class="welcome">
+            欢迎回来，<span
+              th:text="${session.czhCurrentUser.czhUserName}"
+              style="font-weight: 600; color: #667eea"
+            ></span>
+          </div>
+          <a th:href="@{/user/logout}" class="btn btn-logout">退出登录</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="welcome-section">
+        <div class="welcome-content">
+          <div
+            class="admin-avatar"
+            th:text="${session.czhCurrentUser.czhUserName.charAt(0)}"
+          >
+            A
+          </div>
+          <h2>管理员控制台</h2>
+          <p>全面管理图书系统，维护数据完整性</p>
+        </div>
+      </section>
+
+      <section class="admin-actions">
+        <div class="action-card">
+          <div class="action-icon">➕</div>
+          <h3>添加图书</h3>
+          <p>向系统中添加新的图书信息，包括书名、作者、ISBN等详细信息</p>
+          <a th:href="@{/admin/book/add}" class="action-btn">添加图书</a>
+        </div>
+
+        <div class="action-card">
+          <div class="action-icon">📝</div>
+          <h3>编辑图书</h3>
+          <p>修改现有图书的信息，更新价格、描述等内容</p>
+          <a th:href="@{/admin/home}" class="action-btn">查看图书</a>
+        </div>
+
+        <div class="action-card">
+          <div class="action-icon">🗑️</div>
+          <h3>删除图书</h3>
+          <p>删除过时或不需要的图书记录，保持数据整洁</p>
+          <a th:href="@{/admin/home}" class="action-btn">管理图书</a>
+        </div>
+
+        <div class="action-card">
+          <div class="action-icon">📊</div>
+          <h3>系统统计</h3>
+          <p>查看系统使用情况和图书统计数据分析</p>
+          <div
+            style="
+              padding: 12px 30px;
+              background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+              border-radius: 12px;
+              color: #374151;
+              font-size: 14px;
+              font-weight: 500;
+            "
+          >
+            统计功能开发中...
+          </div>
+        </div>
+      </section>
+
+      <section class="stats-section">
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-number">1000+</div>
+            <div class="stat-label">图书总量</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">50+</div>
+            <div class="stat-label">图书分类</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">100+</div>
+            <div class="stat-label">注册用户</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">系统运行</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="books-section">
+        <div class="books-header">
+          <h3>📖 最新图书</h3>
+          <a th:href="@{/admin/home}" class="btn">刷新页面</a>
+        </div>
+
+        <table
+          class="books-table"
+          th:if="${czhBookList != null and !#lists.isEmpty(czhBookList)}"
+        >
+          <thead>
+            <tr>
+              <th>书名</th>
+              <th>作者</th>
+              <th>ISBN</th>
+              <th>价格</th>
+              <th>分类</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="book : ${czhBookList}">
+              <td th:text="${book.czhBookName}">书名</td>
+              <td th:text="${book.czhAuthor}">作者</td>
+              <td th:text="${book.czhIsbn}">ISBN</td>
+              <td th:text="'¥' + ${book.czhPrice}">价格</td>
+              <td th:text="${book.czhCategory}">分类</td>
+              <td>
+                <div class="book-actions">
+                  <a
+                    th:href="@{/admin/book/edit/{id}(id=${book.czhBookId})}"
+                    class="btn-small"
+                    >编辑</a
+                  >
+                  <a
+                    th:href="@{/admin/book/delete/{id}(id=${book.czhBookId})}"
+                    class="btn-small btn-danger"
+                    onclick="return confirm('确定要删除这本图书吗？')"
+                    >删除</a
+                  >
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div
+          th:if="${czhBookList == null or #lists.isEmpty(czhBookList)}"
+          style="text-align: center; padding: 40px; color: #6b7280"
+        >
+          <p style="font-size: 16px; margin-bottom: 20px">📚 暂无图书数据</p>
+          <a th:href="@{/admin/book/add}" class="action-btn">添加第一本图书</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

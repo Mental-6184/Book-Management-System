@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo5.mapper.czhUserMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="czhUserResultMap" type="com.example.demo5.entity.czhUser">
+        <id property="czhUserId" column="czh_user_id"/>
+        <result property="czhUserName" column="czh_user_name"/>
+        <result property="czhPassword" column="czh_password"/>
+        <result property="czhEmail" column="czh_email"/>
+        <result property="czhRole" column="czh_role"/>
+        <result property="czhCreateTime" column="czh_create_time"/>
+    </resultMap>
+
+    <!-- 根据用户名查询用户 -->
+    <select id="findByUserName" resultMap="czhUserResultMap">
+        SELECT * FROM czh_user WHERE czh_user_name = #{czhUserName}
+    </select>
+
+    <!-- 插入新用户 -->
+    <insert id="insertUser" parameterType="com.example.demo5.entity.czhUser" 
+            useGeneratedKeys="true" keyProperty="czhUserId">
+        INSERT INTO czh_user (czh_user_name, czh_password, czh_email, czh_role)
+        VALUES (#{czhUserName}, #{czhPassword}, #{czhEmail}, #{czhRole})
+    </insert>
+
+    <!-- 根据用户名和密码查询用户（登录） -->
+    <select id="findByUserNameAndPassword" resultMap="czhUserResultMap">
+        SELECT * FROM czh_user 
+        WHERE czh_user_name = #{czhUserName} AND czh_password = #{czhPassword}
+    </select>
+
+    <!-- 更新用户信息 -->
+    <update id="updateUser" parameterType="com.example.demo5.entity.czhUser">
+        UPDATE czh_user
+        SET czh_email = #{czhEmail},
+            czh_role = #{czhRole}
+        WHERE czh_user_id = #{czhUserId}
+    </update>
+
+    <!-- 删除用户 -->
+    <delete id="deleteUser">
+        DELETE FROM czh_user WHERE czh_user_id = #{czhUserId}
+    </delete>
+
+</mapper>

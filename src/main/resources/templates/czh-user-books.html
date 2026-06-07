@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>图书列表 - 图书管理系统</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #2d3436;
+        padding: 40px 20px;
+      }
+
+      body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,133.3C960,128,1056,96,1152,90.7C1248,85,1344,107,1392,117.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>')
+          no-repeat bottom;
+        background-size: cover;
+        opacity: 0.3;
+      }
+
+      .header {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        color: #333;
+        padding: 25px 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        position: relative;
+        z-index: 10;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 30px;
+      }
+
+      .header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .welcome {
+        font-size: 16px;
+        color: #555;
+        font-weight: 500;
+      }
+
+      .btn {
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      .btn:hover::before {
+        left: 100%;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, #94a3b8, #64748b);
+      }
+
+      .btn-secondary:hover {
+        box-shadow: 0 8px 20px rgba(148, 163, 184, 0.3);
+      }
+
+      .main-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 30px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .page-header {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .page-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .page-actions {
+        display: flex;
+        gap: 15px;
+      }
+
+      .books-section {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .books-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      .books-table th {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .books-table th:first-child {
+        border-radius: 12px 0 0 0;
+      }
+
+      .books-table th:last-child {
+        border-radius: 0 12px 0 0;
+      }
+
+      .books-table td {
+        padding: 15px;
+        border-bottom: 1px solid #e5e7eb;
+        color: #374151;
+        font-size: 14px;
+      }
+
+      .books-table tr:hover {
+        background: #f8fafc;
+      }
+
+      .books-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .no-books {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6b7280;
+        font-size: 16px;
+      }
+
+      .no-books h3 {
+        margin-bottom: 15px;
+        color: #374151;
+        font-size: 20px;
+      }
+
+      .book-category {
+        background: #e8f0fe;
+        color: #1a73e8;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .book-price {
+        color: #e17055;
+        font-weight: 600;
+        font-family: "Courier New", monospace;
+      }
+
+      @media (max-width: 768px) {
+        .header-content {
+          flex-direction: column;
+          gap: 20px;
+          padding: 0 20px;
+        }
+
+        .user-info {
+          flex-direction: column;
+          gap: 15px;
+          width: 100%;
+        }
+
+        .main-content {
+          padding: 20px 15px;
+        }
+
+        .page-header {
+          flex-direction: column;
+          gap: 20px;
+          padding: 25px;
+        }
+
+        .page-actions {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .books-table {
+          font-size: 12px;
+        }
+
+        .books-table th,
+        .books-table td {
+          padding: 10px 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <h1>📚 图书管理系统</h1>
+        <div class="user-info">
+          <div class="welcome">
+            欢迎回来，<span
+              th:text="${session.czhCurrentUser.czhUserName}"
+              style="font-weight: 600; color: #667eea"
+            ></span>
+          </div>
+          <a th:href="@{/user/logout}" class="btn btn-logout">退出登录</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="page-header">
+        <div class="page-title">
+          <span>📖</span>
+          <span>全部图书</span>
+        </div>
+        <div class="page-actions">
+          <a th:href="@{/user/home}" class="btn btn-secondary">返回首页</a>
+          <a th:href="@{/book/search-single}" class="btn btn-secondary"
+            >搜索图书</a
+          >
+        </div>
+      </div>
+
+      <section class="books-section">
+        <div th:if="${czhBookList != null and !#lists.isEmpty(czhBookList)}">
+          <table class="books-table">
+            <thead>
+              <tr>
+                <th>书名</th>
+                <th>作者</th>
+                <th>ISBN</th>
+                <th>出版社</th>
+                <th>出版日期</th>
+                <th>价格</th>
+                <th>分类</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="book : ${czhBookList}">
+                <td th:text="${book.czhBookName}" style="font-weight: 600">
+                  书名
+                </td>
+                <td th:text="${book.czhAuthor}">作者</td>
+                <td
+                  th:text="${book.czhIsbn}"
+                  style="font-family: monospace; font-size: 12px"
+                >
+                  ISBN
+                </td>
+                <td th:text="${book.czhPublisher}">出版社</td>
+                <td th:text="${book.czhPublishDate}">出版日期</td>
+                <td class="book-price" th:text="'¥' + ${book.czhPrice}">
+                  价格
+                </td>
+                <td>
+                  <span class="book-category" th:text="${book.czhCategory}"
+                    >分类</span
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div
+          th:if="${czhBookList == null or #lists.isEmpty(czhBookList)}"
+          class="no-books"
+        >
+          <h3>📚 暂无图书数据</h3>
+          <p>系统中暂时没有图书，请稍后再来查看</p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

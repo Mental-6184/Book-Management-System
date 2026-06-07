@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo5.mapper.czhBookMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="czhBookResultMap" type="com.example.demo5.entity.czhBook">
+        <id property="czhBookId" column="czh_book_id"/>
+        <result property="czhBookName" column="czh_book_name"/>
+        <result property="czhAuthor" column="czh_author"/>
+        <result property="czhIsbn" column="czh_isbn"/>
+        <result property="czhPublisher" column="czh_publisher"/>
+        <result property="czhPublishDate" column="czh_publish_date"/>
+        <result property="czhPrice" column="czh_price"/>
+        <result property="czhCategory" column="czh_category"/>
+        <result property="czhDescription" column="czh_description"/>
+        <result property="czhCoverImage" column="czh_cover_image"/>
+        <result property="czhCreateTime" column="czh_create_time"/>
+        <result property="czhUpdateTime" column="czh_update_time"/>
+    </resultMap>
+
+    <!-- 查询所有图书 -->
+    <select id="findAllBooks" resultMap="czhBookResultMap">
+        SELECT * FROM czh_book ORDER BY czh_create_time DESC
+    </select>
+
+    <!-- 根据ID查询图书 -->
+    <select id="findBookById" resultMap="czhBookResultMap">
+        SELECT * FROM czh_book WHERE czh_book_id = #{czhBookId}
+    </select>
+
+    <!-- 插入图书 -->
+    <insert id="insertBook" parameterType="com.example.demo5.entity.czhBook"
+            useGeneratedKeys="true" keyProperty="czhBookId">
+        INSERT INTO czh_book (czh_book_name, czh_author, czh_isbn, czh_publisher, 
+                              czh_publish_date, czh_price, czh_category, czh_description, czh_cover_image)
+        VALUES (#{czhBookName}, #{czhAuthor}, #{czhIsbn}, #{czhPublisher}, 
+                #{czhPublishDate}, #{czhPrice}, #{czhCategory}, #{czhDescription}, #{czhCoverImage})
+    </insert>
+
+    <!-- 更新图书 -->
+    <update id="updateBook" parameterType="com.example.demo5.entity.czhBook">
+        UPDATE czh_book
+        SET czh_book_name = #{czhBookName},
+            czh_author = #{czhAuthor},
+            czh_isbn = #{czhIsbn},
+            czh_publisher = #{czhPublisher},
+            czh_publish_date = #{czhPublishDate},
+            czh_price = #{czhPrice},
+            czh_category = #{czhCategory},
+            czh_description = #{czhDescription}
+            <if test="czhCoverImage != null and czhCoverImage != ''">
+                , czh_cover_image = #{czhCoverImage}
+            </if>
+        WHERE czh_book_id = #{czhBookId}
+    </update>
+
+    <!-- 删除图书 -->
+    <delete id="deleteBook">
+        DELETE FROM czh_book WHERE czh_book_id = #{czhBookId}
+    </delete>
+
+    <!-- 根据书名查询 -->
+    <select id="findByBookName" resultMap="czhBookResultMap">
+        SELECT * FROM czh_book WHERE czh_book_name LIKE CONCAT('%', #{czhBookName}, '%')
+    </select>
+
+    <!-- 根据作者查询 -->
+    <select id="findByAuthor" resultMap="czhBookResultMap">
+        SELECT * FROM czh_book WHERE czh_author LIKE CONCAT('%', #{czhAuthor}, '%')
+    </select>
+
+    <!-- 根据ISBN查询 -->
+    <select id="findByIsbn" resultMap="czhBookResultMap">
+        SELECT * FROM czh_book WHERE czh_isbn = #{czhIsbn}
+    </select>
+
+    <!-- 多条件组合查询 -->
+    <select id="findByMultiConditions" resultMap="czhBookResultMap">
+        SELECT * FROM czh_book
+        <where>
+            <if test="czhBookName != null and czhBookName != ''">
+                AND czh_book_name LIKE CONCAT('%', #{czhBookName}, '%')
+            </if>
+            <if test="czhAuthor != null and czhAuthor != ''">
+                AND czh_author LIKE CONCAT('%', #{czhAuthor}, '%')
+            </if>
+            <if test="czhIsbn != null and czhIsbn != ''">
+                AND czh_isbn = #{czhIsbn}
+            </if>
+            <if test="czhCategory != null and czhCategory != ''">
+                AND czh_category = #{czhCategory}
+            </if>
+        </where>
+        ORDER BY czh_create_time DESC
+    </select>
+
+</mapper>

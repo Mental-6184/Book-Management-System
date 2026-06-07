@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>用户注册 - 图书管理系统</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        position: relative;
+        overflow: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,133.3C960,128,1056,96,1152,90.7C1248,85,1344,107,1392,117.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>')
+          no-repeat bottom;
+        background-size: cover;
+        opacity: 0.3;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 50px 40px;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        width: 480px;
+        position: relative;
+        z-index: 1;
+        animation: slideIn 0.6s ease-out;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 35px;
+        font-size: 28px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        position: relative;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 600;
+        font-size: 14px;
+        transition: color 0.3s;
+      }
+
+      input[type="text"],
+      input[type="password"],
+      input[type="email"] {
+        width: 100%;
+        padding: 15px 20px 15px 45px;
+        border: 2px solid #e1e8ed;
+        border-radius: 12px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+      }
+
+      input[type="text"]:focus,
+      input[type="password"]:focus,
+      input[type="email"]:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        margin-top: 10px;
+      }
+
+      .btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .btn:hover::before {
+        left: 100%;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .link {
+        text-align: center;
+        margin-top: 25px;
+        font-size: 14px;
+      }
+
+      .link a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .link a::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #667eea;
+        transition: width 0.3s ease;
+      }
+
+      .link a:hover::after {
+        width: 100%;
+      }
+
+      .error {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        color: white;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        text-align: center;
+        font-weight: 500;
+        animation: shake 0.5s ease-in-out;
+        box-shadow: 0 5px 15px rgba(238, 90, 36, 0.3);
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-10px);
+        }
+        75% {
+          transform: translateX(10px);
+        }
+      }
+
+      .input-icon {
+        position: absolute;
+        left: 15px;
+        top: 38px;
+        color: #999;
+        font-size: 16px;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .password-requirements {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #666;
+        line-height: 1.4;
+      }
+
+      .requirements-list {
+        margin-top: 5px;
+      }
+
+      .requirements-list span {
+        display: block;
+        margin: 2px 0;
+        padding-left: 15px;
+        position: relative;
+      }
+
+      .requirements-list span::before {
+        content: "○";
+        position: absolute;
+        left: 0;
+        color: #999;
+      }
+
+      .requirements-list .valid::before {
+        content: "✓";
+        color: #51cf66;
+      }
+
+      .requirements-list .valid {
+        color: #51cf66;
+      }
+
+      .requirements-list .invalid {
+        color: #ff6b6b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>图书管理系统 - 注册</h2>
+
+      <div th:if="${czhError}" class="error" th:text="${czhError}"></div>
+
+      <form th:action="@{/user/register}" method="post" id="registerForm">
+        <div class="form-group">
+          <label for="userName">用户名</label>
+          <span class="input-icon">👤</span>
+          <input
+            type="text"
+            id="userName"
+            name="czhUserName"
+            required
+            placeholder="请输入用户名（3-20个字符）"
+            minlength="3"
+            maxlength="20"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">密码</label>
+          <span class="input-icon">🔒</span>
+          <input
+            type="password"
+            id="password"
+            name="czhPassword"
+            required
+            placeholder="请输入密码（至少6个字符）"
+            minlength="6"
+          />
+          <div class="password-requirements">
+            <div class="requirements-list">
+              <span id="lengthReq">至少6个字符</span>
+              <span id="letterReq">包含字母</span>
+              <span id="numberReq">包含数字</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">确认密码</label>
+          <span class="input-icon">🔒</span>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="czhConfirmPassword"
+            required
+            placeholder="请再次输入密码"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">邮箱</label>
+          <span class="input-icon">✉️</span>
+          <input
+            type="email"
+            id="email"
+            name="czhEmail"
+            required
+            placeholder="请输入邮箱地址"
+          />
+        </div>
+
+        <button type="submit" class="btn">立即注册</button>
+      </form>
+
+      <div class="link">
+        <p>已有账号？ <a th:href="@{/user/login}">立即登录</a></p>
+      </div>
+    </div>
+
+    <script>
+      // 密码强度检查
+      const passwordInput = document.getElementById("password");
+      const confirmPasswordInput = document.getElementById("confirmPassword");
+      const lengthReq = document.getElementById("lengthReq");
+      const letterReq = document.getElementById("letterReq");
+      const numberReq = document.getElementById("numberReq");
+      const registerForm = document.getElementById("registerForm");
+
+      function checkPasswordStrength(password) {
+        const hasLength = password.length >= 6;
+        const hasLetter = /[a-zA-Z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+
+        lengthReq.className = hasLength ? "valid" : "invalid";
+        letterReq.className = hasLetter ? "valid" : "invalid";
+        numberReq.className = hasNumber ? "valid" : "invalid";
+
+        return hasLength && hasLetter && hasNumber;
+      }
+
+      passwordInput.addEventListener("input", function () {
+        checkPasswordStrength(this.value);
+      });
+
+      registerForm.addEventListener("submit", function (e) {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        if (password !== confirmPassword) {
+          e.preventDefault();
+          alert("两次输入的密码不一致！");
+          return false;
+        }
+
+        if (!checkPasswordStrength(password)) {
+          e.preventDefault();
+          alert("密码不符合要求，请检查密码强度！");
+          return false;
+        }
+      });
+
+      // 初始化密码要求状态
+      checkPasswordStrength("");
+    </script>
+  </body>
+</html>
